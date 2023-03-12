@@ -1,6 +1,7 @@
 const expressAsyncHandler = require("express-async-handler");
 const chats = require("../models/chatModels");
 const person = require("../models/userModel");
+const messages = require("../models/messageModel");
 
 const accessChat = expressAsyncHandler(async (req, res) => {
 	const { id, currentuser } = await req.body;
@@ -47,10 +48,10 @@ const accessChat = expressAsyncHandler(async (req, res) => {
 });
 
 const fetchChat = expressAsyncHandler(async (req, res) => {
-	const { id } = await req.body;
+	const { id } = await req?.body;
 	try {
 		chats
-			.find({
+			?.find({
 				users: {
 					$elemMatch: { $eq: id },
 				},
@@ -60,7 +61,7 @@ const fetchChat = expressAsyncHandler(async (req, res) => {
 			.populate("latestmessage")
 			.sort({ updatedAt: -1 })
 			.then(async (result) => {
-				result = await person.populate(result, {
+				result = await person?.populate(result, {
 					path: "latestmessage.sender",
 					select: "name pic email",
 				});
@@ -156,6 +157,20 @@ const removeToGroup = expressAsyncHandler(async (req, res) => {
 		res.status(200).json(removed);
 	}
 });
+
+const deleteMessage = expressAsyncHandler(async (req, res) => {
+	const { messageId } = await req.body;
+	if (!messageId) {
+		return res.status(500).send({ messages: "Enter Valid message id" });
+	}
+	const deleted = await messages.findByIdAndDelete(messageId);
+	if (!deleted) {
+		res.status(404);
+		throw new Error("Message not found");
+	} else {
+		res.status(200).json(deleted);
+	}
+});
 module.exports = {
 	accessChat,
 	fetchChat,
@@ -163,4 +178,5 @@ module.exports = {
 	renameGroups,
 	addToGroup,
 	removeToGroup,
+	deleteMessage,
 };
