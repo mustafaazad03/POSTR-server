@@ -5,11 +5,7 @@ const cors = require("cors");
 
 dotenv.config();
 const app = express();
-app.use(
-	cors({
-		origin: "https://postrapp.vercel.app/" || "http://localhost:3000/",
-	})
-);
+app.use(cors());
 app.use(express.json());
 const port = process.env.PORT;
 const routes = require("./router/userRoutes");
