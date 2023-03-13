@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 app.use(
 	cors({
-		origin: "https://postrapp.vercel.app/",
+		origin: "https://postrapp.vercel.app/" || "http://localhost:3000/",
 	})
 );
 app.use(express.json());
